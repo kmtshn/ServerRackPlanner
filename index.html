@@ -144,14 +144,14 @@
             position: relative;
             display: flex;
             align-items: flex-end;
-            padding: 30px 20px 40px 60px;
+            padding: 30px 20px 40px 80px;
             min-width: fit-content;
             transition: gap 0.3s ease;
         }
 
         .rack-wrapper {
             position: relative;
-            margin-left: 20px;
+            margin-left: 30px;
         }
 
         .rack {
@@ -173,23 +173,38 @@
             white-space: nowrap;
         }
 
-        .rack-depth-indicator {
+        .height-indicator {
             position: absolute;
-            top: 50%;
-            left: 100%;
-            transform: translateY(-50%);
-            margin-left: 10px;
-            font-size: 10px;
-            color: #666;
+            left: 155px;
+            background: #3498db;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 11px;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 10;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            font-weight: 500;
         }
 
-        .depth-line {
-            width: 30px;
-            height: 1px;
-            background: #999;
+        .height-indicator::before {
+            content: '';
+            position: absolute;
+            left: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 5px 5px 5px 0;
+            border-color: transparent #3498db transparent transparent;
+        }
+
+        .height-indicator .unit-label {
+            font-weight: bold;
         }
 
         .depth-visual {
@@ -265,9 +280,31 @@
             background: #e74c3c !important;
         }
 
+        .unit.selected-front::before {
+            content: 'F';
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        .unit.selected-back::after {
+            content: 'B';
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+        }
+
         .unit-number {
             position: absolute;
-            left: -35px;
+            left: -40px;
             top: 50%;
             transform: translateY(-50%);
             color: #888;
@@ -349,6 +386,14 @@
             animation: dash 1.5s linear infinite;
         }
 
+        .cable-line-mixed {
+            stroke: #9b59b6;
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 6, 3;
+            animation: dash 1.2s linear infinite;
+        }
+
         @keyframes dash {
             to {
                 stroke-dashoffset: -10;
@@ -358,9 +403,23 @@
         .cable-line-vertical {
             position: absolute;
             width: 3px;
-            background: #e74c3c;
             opacity: 0.7;
+        }
+
+        .cable-line-vertical.front {
+            background: #e74c3c;
+            left: -10px;
+        }
+
+        .cable-line-vertical.back {
+            background: #3498db;
             right: -10px;
+        }
+
+        .cable-line-vertical.mixed {
+            background: #9b59b6;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .height-scale {
@@ -388,6 +447,75 @@
             transform: translateY(-50%);
             white-space: nowrap;
         }
+
+        .same-rack-config {
+            grid-column: span 3;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .position-config {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85em;
+        }
+
+        .position-label {
+            font-weight: 500;
+            min-width: 80px;
+        }
+
+        .side-selector {
+            display: flex;
+            gap: 10px;
+        }
+
+        .side-selector label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .routing-option {
+            grid-column: span 2;
+            padding: 10px;
+            background: #fff;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .routing-option-title {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 0.85em;
+        }
+
+        .routing-selector {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+        }
+
+        .routing-selector label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .routing-note {
+            font-size: 0.75em;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -406,19 +534,19 @@
             </div>
             
             <div class="control-group">
-                <label>奥行き (mm)</label>
+                <label>奥行き (cm)</label>
                 <select id="rackDepth">
-                    <option value="600">600mm (ネットワーク機器用)</option>
-                    <option value="800">800mm (標準)</option>
-                    <option value="1000" selected>1000mm (最も一般的)</option>
-                    <option value="1200">1200mm (深型/ストレージ)</option>
+                    <option value="60">60cm (ネットワーク機器用)</option>
+                    <option value="80">80cm (標準)</option>
+                    <option value="100" selected>100cm (最も一般的)</option>
+                    <option value="120">120cm (深型/ストレージ)</option>
                     <option value="custom">カスタム</option>
                 </select>
             </div>
 
             <div class="control-group" id="customDepthGroup" style="display: none;">
-                <label>カスタム奥行き (mm)</label>
-                <input type="number" id="customDepth" min="500" max="1500" value="1000" step="50">
+                <label>カスタム奥行き (cm)</label>
+                <input type="number" id="customDepth" min="50" max="150" value="100" step="5">
             </div>
             
             <div class="control-group">
@@ -427,11 +555,6 @@
                     <option value="2">2台</option>
                     <option value="1">1台</option>
                 </select>
-            </div>
-            
-            <div class="control-group">
-                <label>確認するU位置</label>
-                <input type="number" id="checkUnit" min="1" max="42" value="25">
             </div>
             
             <div class="control-group">
@@ -458,8 +581,33 @@
             <div class="control-group">
                 <label>ラック間距離</label>
                 <div class="distance-input-wrapper">
-                    <input type="number" id="rackDistance" min="0.3" max="10" value="0.6" step="0.1">
+                    <input type="number" id="rackDistance" min="0.3" max="10" value="1.0" step="0.1">
                     <span class="distance-unit">m</span>
+                </div>
+            </div>
+            <div class="same-rack-config" id="sameRackConfig" style="display: none;">
+                <div class="position-config">
+                    <span class="position-label" id="position1Label">位置1:</span>
+                    <div class="side-selector">
+                        <label><input type="radio" name="position1Side" value="front" checked> 前面</label>
+                        <label><input type="radio" name="position1Side" value="back"> 背面</label>
+                    </div>
+                </div>
+                <div class="position-config">
+                    <span class="position-label" id="position2Label">位置2:</span>
+                    <div class="side-selector">
+                        <label><input type="radio" name="position2Side" value="front" checked> 前面</label>
+                        <label><input type="radio" name="position2Side" value="back"> 背面</label>
+                    </div>
+                </div>
+                <div class="routing-option" id="routingOption" style="display: none;">
+                    <div class="routing-option-title">配線経路:</div>
+                    <div class="routing-selector">
+                        <label><input type="radio" name="routingPath" value="direct" checked> 直接配線</label>
+                        <label><input type="radio" name="routingPath" value="through-back"> 背面経由</label>
+                        <label><input type="radio" name="routingPath" value="through-front"> 前面経由</label>
+                    </div>
+                    <div class="routing-note">※ 同じ面への配線時に反対側を経由する場合に選択</div>
                 </div>
             </div>
         </div>
@@ -470,19 +618,19 @@
             <div class="info-panel">
                 <div class="info-item">
                     <span class="info-label">ラック仕様:</span>
-                    <span class="info-value" id="rackSpec">42U / 1000mm</span>
+                    <span class="info-value" id="rackSpec">42U / 100cm</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">総高さ:</span>
-                    <span class="info-value" id="totalHeight">1866.9mm (186.7cm)</span>
+                    <span class="info-value" id="totalHeight">186.7cm</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">ラック間距離:</span>
-                    <span class="info-value" id="rackDistanceInfo">0.6m</span>
+                    <span class="info-value" id="rackDistanceInfo">1.0m</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">選択U位置の高さ:</span>
-                    <span class="info-value" id="selectedHeight">25U = 1067.0mm (床から)</span>
+                    <span class="info-value" id="selectedHeight">-</span>
                 </div>
                 <div class="info-item" id="cableInfo" style="display: none;">
                     <span class="info-label">必要ケーブル長:</span>
@@ -541,17 +689,53 @@
             }
         });
 
+        // 同一ラック内の各位置の配線面変更を監視
+        document.querySelectorAll('input[name="position1Side"], input[name="position2Side"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (selectedUnits.length === 2 && selectedUnits[0].rack === selectedUnits[1].rack) {
+                    updateRoutingOptions();
+                    updateSelectedUnitsSides();
+                    calculateCableLength();
+                    drawCable();
+                }
+            });
+        });
+
+        // 配線経路の変更を監視
+        document.querySelectorAll('input[name="routingPath"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (selectedUnits.length === 2 && selectedUnits[0].rack === selectedUnits[1].rack) {
+                    calculateCableLength();
+                    drawCable();
+                }
+            });
+        });
+
+        function updateRoutingOptions() {
+            const position1Side = document.querySelector('input[name="position1Side"]:checked')?.value;
+            const position2Side = document.querySelector('input[name="position2Side"]:checked')?.value;
+            const routingOption = document.getElementById('routingOption');
+            
+            // 両方が同じ面（前面→前面 or 背面→背面）の場合のみ経由オプションを表示
+            if (position1Side === position2Side) {
+                routingOption.style.display = 'block';
+            } else {
+                routingOption.style.display = 'none';
+                // 異なる面の場合は直接配線に戻す
+                document.querySelector('input[name="routingPath"][value="direct"]').checked = true;
+            }
+        }
+
         function getDepthValue() {
             const depthSelect = document.getElementById('rackDepth');
             if (depthSelect.value === 'custom') {
-                return parseInt(document.getElementById('customDepth').value);
+                return parseInt(document.getElementById('customDepth').value) * 10;
             } else {
-                return parseInt(depthSelect.value);
+                return parseInt(depthSelect.value) * 10;
             }
         }
 
         function getDistanceValue() {
-            // メートルをミリメートルに変換
             const distanceM = parseFloat(document.getElementById('rackDistance').value);
             return distanceM * 1000;
         }
@@ -560,14 +744,12 @@
             const distanceM = parseFloat(document.getElementById('rackDistance').value);
             document.getElementById('rackDistanceInfo').textContent = `${distanceM}m`;
             
-            // ラック間の距離を視覚的に更新
             const container = document.querySelector('.rack-container');
             if (container) {
-                const pixelDistance = distanceM * 1000 * SCALE * 0.3; // メートルをmmに変換してスケール調整
+                const pixelDistance = distanceM * 1000 * SCALE * 0.3;
                 container.style.gap = `${pixelDistance}px`;
             }
             
-            // ケーブル長を再計算
             if (selectedUnits.length === 2 && selectedUnits[0].rack !== selectedUnits[1].rack) {
                 calculateCableLength();
                 drawCable();
@@ -584,10 +766,6 @@
                     <div class="rack" id="${id}" style="height: ${pixelHeight}px;">
                         <div class="rack-label">ラック ${id.replace('rack', '')}</div>
                         <div class="depth-visual" style="width: ${depthPx}px;"></div>
-                        <div class="rack-depth-indicator">
-                            <span class="depth-line"></span>
-                            <span>${depth}mm</span>
-                        </div>
             `;
             
             for (let u = height; u >= 1; u--) {
@@ -597,7 +775,9 @@
                          data-rack="${id}" 
                          data-unit="${u}" 
                          style="height: ${unitHeightPx}px;"
-                         onclick="selectUnit('${id}', ${u})">
+                         onclick="selectUnit('${id}', ${u})"
+                         onmouseover="showHeightIndicator(this, ${u})"
+                         onmouseout="hideHeightIndicator(this)">
                         <span class="unit-number">${u}U</span>
                     </div>
                 `;
@@ -610,10 +790,29 @@
             return rackHtml;
         }
 
+        function showHeightIndicator(element, unitNumber) {
+            const heightFromBottom = (unitNumber - 1) * UNIT_HEIGHT_MM;
+            const heightCm = (heightFromBottom / 10).toFixed(1);
+            
+            const indicator = document.createElement('div');
+            indicator.className = 'height-indicator';
+            indicator.innerHTML = `<span class="unit-label">${unitNumber}U</span> ${heightCm}cm`;
+            indicator.style.top = `${element.offsetTop + element.offsetHeight/2 - 10}px`;
+            
+            element.parentElement.appendChild(indicator);
+        }
+
+        function hideHeightIndicator(element) {
+            const indicator = element.parentElement.querySelector('.height-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
         function createDistanceIndicator(distanceM) {
             const pixelDistance = distanceM * 1000 * SCALE * 0.3;
             return `
-                <div class="distance-indicator" style="width: ${pixelDistance}px; left: 150px;">
+                <div class="distance-indicator" style="width: ${pixelDistance}px; left: 180px;">
                     <div class="distance-line" style="width: 100%;">
                         <div class="distance-label">${distanceM}m</div>
                     </div>
@@ -621,28 +820,67 @@
             `;
         }
 
+        function updateSelectedUnitsSides() {
+            selectedUnits.forEach((unit, index) => {
+                const sideRadio = document.querySelector(`input[name="position${index + 1}Side"]:checked`);
+                if (sideRadio) {
+                    unit.side = sideRadio.value;
+                    
+                    // UIの更新
+                    const unitElement = document.querySelector(`[data-rack="${unit.rack}"][data-unit="${unit.unit}"]`);
+                    unitElement.classList.remove('selected-front', 'selected-back');
+                    unitElement.classList.add(`selected-${unit.side}`);
+                }
+            });
+        }
+
         function selectUnit(rackId, unitNumber) {
             const unitElement = document.querySelector(`[data-rack="${rackId}"][data-unit="${unitNumber}"]`);
             
-            if (document.getElementById('rackCount').value === '2') {
+            if (document.getElementById('rackCount').value === '2' || document.getElementById('rackCount').value === '1') {
                 if (selectedUnits.length >= 2) {
-                    document.querySelectorAll('.unit.selected').forEach(el => el.classList.remove('selected'));
+                    document.querySelectorAll('.unit.selected').forEach(el => {
+                        el.classList.remove('selected', 'selected-front', 'selected-back');
+                    });
                     selectedUnits = [];
                     document.querySelector('.cable-line-vertical')?.remove();
                     document.querySelector('.cable-svg')?.remove();
                 }
                 
-                selectedUnits.push({ rack: rackId, unit: unitNumber });
-                unitElement.classList.add('selected');
+                // デフォルトは前面
+                const side = 'front';
+                selectedUnits.push({ rack: rackId, unit: unitNumber, side: side });
+                unitElement.classList.add('selected', `selected-${side}`);
                 
                 if (selectedUnits.length === 2) {
+                    const sameRackConfig = document.getElementById('sameRackConfig');
+                    if (selectedUnits[0].rack === selectedUnits[1].rack) {
+                        // 同一ラック内配線の場合
+                        sameRackConfig.style.display = 'grid';
+                        
+                        // ラベルを更新
+                        document.getElementById('position1Label').textContent = `${selectedUnits[0].unit}U:`;
+                        document.getElementById('position2Label').textContent = `${selectedUnits[1].unit}U:`;
+                        
+                        // デフォルトで前面を選択
+                        document.querySelector('input[name="position1Side"][value="front"]').checked = true;
+                        document.querySelector('input[name="position2Side"][value="front"]').checked = true;
+                        
+                        // 配線経路オプションを更新
+                        updateRoutingOptions();
+                    } else {
+                        sameRackConfig.style.display = 'none';
+                    }
+                    
                     calculateCableLength();
                     drawCable();
                 }
             } else {
-                document.querySelectorAll('.unit.selected').forEach(el => el.classList.remove('selected'));
-                unitElement.classList.add('selected');
-                selectedUnits = [{ rack: rackId, unit: unitNumber }];
+                document.querySelectorAll('.unit.selected').forEach(el => {
+                    el.classList.remove('selected', 'selected-front', 'selected-back');
+                });
+                unitElement.classList.add('selected', 'selected-front');
+                selectedUnits = [{ rack: rackId, unit: unitNumber, side: 'front' }];
             }
             
             updateUnitHeight(unitNumber);
@@ -650,39 +888,71 @@
 
         function updateUnitHeight(unitNumber) {
             const heightFromBottom = (unitNumber - 1) * UNIT_HEIGHT_MM;
+            const heightCm = (heightFromBottom / 10).toFixed(1);
             document.getElementById('selectedHeight').textContent = 
-                `${unitNumber}U = ${heightFromBottom.toFixed(1)}mm (床から)`;
+                `${unitNumber}U = ${heightCm}cm (床から)`;
         }
 
         function calculateCableLength() {
             if (selectedUnits.length !== 2) return;
             
             const depth = getDepthValue();
-            const distance = getDistanceValue(); // mm単位
-            const distanceM = distance / 1000; // メートル単位
+            const distance = getDistanceValue();
+            const distanceM = distance / 1000;
             let totalLength;
             let routeDescription = '';
             
             if (selectedUnits[0].rack === selectedUnits[1].rack) {
+                // 同一ラック内配線
+                const position1Side = document.querySelector('input[name="position1Side"]:checked')?.value || 'front';
+                const position2Side = document.querySelector('input[name="position2Side"]:checked')?.value || 'front';
+                const routingPath = document.querySelector('input[name="routingPath"]:checked')?.value || 'direct';
+                
+                selectedUnits[0].side = position1Side;
+                selectedUnits[1].side = position2Side;
+                
                 const unit1Height = (selectedUnits[0].unit - 1) * UNIT_HEIGHT_MM;
                 const unit2Height = (selectedUnits[1].unit - 1) * UNIT_HEIGHT_MM;
                 const verticalDistance = Math.abs(unit1Height - unit2Height);
                 
-                totalLength = verticalDistance + 300;
-                routeDescription = '同一ラック内配線';
+                // 配線経路による追加距離の計算
+                let additionalLength = 0;
+                let routeDetail = '';
+                
+                if (position1Side === position2Side) {
+                    // 同じ面への配線
+                    if (routingPath === 'through-back' && position1Side === 'front') {
+                        // 前面→前面で背面経由
+                        additionalLength = depth * 2; // 背面へ行って戻る
+                        routeDetail = ' (背面経由)';
+                    } else if (routingPath === 'through-front' && position1Side === 'back') {
+                        // 背面→背面で前面経由
+                        additionalLength = depth * 2; // 前面へ行って戻る
+                        routeDetail = ' (前面経由)';
+                    }
+                } else {
+                    // 異なる面への配線
+                    additionalLength = depth;
+                }
+                
+                totalLength = verticalDistance + 300 + additionalLength;
+                
+                const side1Label = position1Side === 'back' ? '背面' : '前面';
+                const side2Label = position2Side === 'back' ? '背面' : '前面';
+                routeDescription = `同一ラック内配線 (${selectedUnits[0].unit}U:${side1Label} → ${selectedUnits[1].unit}U:${side2Label})${routeDetail}`;
             } else {
+                // 異なるラック間の配線
                 const rack1Side = document.getElementById('rack1Side').value;
                 const rack2Side = document.getElementById('rack2Side').value;
                 
                 const unit1Height = (selectedUnits[0].unit - 1) * UNIT_HEIGHT_MM;
                 const unit2Height = (selectedUnits[1].unit - 1) * UNIT_HEIGHT_MM;
                 
-                // 配線面による追加距離の計算
                 let rack1Additional = rack1Side === 'back' ? depth : 0;
                 let rack2Additional = rack2Side === 'back' ? depth : 0;
                 
                 const rack1ToFloor = unit1Height + 200 + rack1Additional;
-                const floorHorizontal = distance; // mm単位の距離を使用
+                const floorHorizontal = distance;
                 const floorToRack2 = unit2Height + 200 + rack2Additional;
                 
                 totalLength = (rack1ToFloor + floorHorizontal + floorToRack2) * 1.2;
@@ -727,8 +997,28 @@
             const bottom = Math.max(unit1.offsetTop + unit1.offsetHeight, unit2.offsetTop + unit2.offsetHeight);
             const height = bottom - top;
             
+            const position1Side = selectedUnits[0].side || 'front';
+            const position2Side = selectedUnits[1].side || 'front';
+            const routingPath = document.querySelector('input[name="routingPath"]:checked')?.value || 'direct';
+            
+            let cableClass = 'front';
+            
+            if (position1Side === position2Side) {
+                // 同じ面への配線
+                if (position1Side === 'back' && routingPath !== 'through-front') {
+                    cableClass = 'back';
+                } else if (position1Side === 'front' && routingPath === 'through-back') {
+                    cableClass = 'mixed'; // 背面経由を示す
+                } else if (position1Side === 'back' && routingPath === 'through-front') {
+                    cableClass = 'mixed'; // 前面経由を示す
+                }
+            } else {
+                // 異なる面への配線
+                cableClass = 'mixed';
+            }
+            
             const cableLine = document.createElement('div');
-            cableLine.className = 'cable-line-vertical';
+            cableLine.className = `cable-line-vertical ${cableClass}`;
             cableLine.style.top = `${top}px`;
             cableLine.style.height = `${height}px`;
             
@@ -794,17 +1084,13 @@
 
         function updateVisualization() {
             const height = parseInt(document.getElementById('rackHeight').value);
-            const depth = getDepthValue();
+            const depthCm = document.getElementById('rackDepth').value === 'custom' 
+                ? parseInt(document.getElementById('customDepth').value)
+                : parseInt(document.getElementById('rackDepth').value);
+            const depth = depthCm * 10;
             const distanceM = parseFloat(document.getElementById('rackDistance').value);
-            const distance = distanceM * 1000; // mm単位
+            const distance = distanceM * 1000;
             const rackCount = parseInt(document.getElementById('rackCount').value);
-            const checkUnit = parseInt(document.getElementById('checkUnit').value);
-            
-            if (checkUnit > height) {
-                alert(`確認するU位置は${height}U以下にしてください`);
-                document.getElementById('checkUnit').value = height;
-                return;
-            }
             
             const pixelDistance = distance * SCALE * 0.3;
             
@@ -815,7 +1101,6 @@
             for (let i = 1; i <= rackCount; i++) {
                 visualizationHtml += createRack(`rack${i}`, height, depth);
                 
-                // 2ラックの場合、間に距離表示を追加
                 if (i === 1 && rackCount === 2) {
                     visualizationHtml += createDistanceIndicator(distanceM);
                 }
@@ -828,17 +1113,19 @@
             document.getElementById('visualization').innerHTML = visualizationHtml;
             
             const totalHeight = height * UNIT_HEIGHT_MM;
-            document.getElementById('rackSpec').textContent = `${height}U / ${depth}mm`;
-            document.getElementById('totalHeight').textContent = `${totalHeight.toFixed(1)}mm (${(totalHeight/10).toFixed(1)}cm)`;
+            const totalHeightCm = (totalHeight / 10).toFixed(1);
+            document.getElementById('rackSpec').textContent = `${height}U / ${depthCm}cm`;
+            document.getElementById('totalHeight').textContent = `${totalHeightCm}cm`;
             document.getElementById('rackDistanceInfo').textContent = rackCount === 2 ? `${distanceM}m` : '-';
             
-            updateUnitHeight(checkUnit);
+            // 選択U位置の高さをクリア
+            document.getElementById('selectedHeight').textContent = '-';
             
             selectedUnits = [];
             document.getElementById('cableInfo').style.display = 'none';
             document.getElementById('cableRouteInfo').style.display = 'none';
+            document.getElementById('sameRackConfig').style.display = 'none';
             
-            // ラック数に応じてケーブル設定セクションの表示/非表示
             const cableConfig = document.getElementById('cableConfigSection');
             if (rackCount === 2) {
                 cableConfig.style.display = 'grid';
