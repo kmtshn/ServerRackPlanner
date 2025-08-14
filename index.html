@@ -474,6 +474,19 @@
             font-style: italic;
         }
 
+        .distance-label {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            border: 1px solid #ddd;
+            z-index: 101;
+            pointer-events: none;
+        }
+
         @media (max-height: 900px) {
             .visualization {
                 min-height: 450px;
@@ -548,7 +561,7 @@
             <div class="control-group">
                 <label>ラック間距離</label>
                 <div class="distance-input-wrapper">
-                    <input type="number" id="rackDistance" min="0.3" max="10" value="0.5" step="0.1">
+                    <input type="number" id="rackDistance" min="0.3" max="100" value="0.5" step="0.1">
                     <span class="distance-unit">m</span>
                 </div>
             </div>
@@ -739,7 +752,9 @@
             
             const container = document.querySelector('.rack-container');
             if (container) {
-                const pixelDistance = distanceM * 1000 * SCALE * 0.3;
+                // 7mまでは通常通り、7m超えは7mの表示で固定
+                const displayDistance = Math.min(distanceM, 7);
+                const pixelDistance = displayDistance * 1000 * SCALE * 0.3;
                 container.style.gap = `${pixelDistance}px`;
             }
             
@@ -827,6 +842,7 @@
                     selectedUnits = [];
                     document.querySelector('.cable-line-vertical')?.remove();
                     document.querySelector('.cable-svg')?.remove();
+                    document.querySelector('.distance-label')?.remove();
                 }
                 
                 // ラック間配線の場合は、選択されたラックに応じて配線面設定を使用（修正版）
@@ -972,6 +988,7 @@
         function drawCable() {
             document.querySelector('.cable-svg')?.remove();
             document.querySelector('.cable-line-vertical')?.remove();
+            document.querySelector('.distance-label')?.remove();
             
             if (selectedUnits.length !== 2) return;
             
@@ -1077,6 +1094,17 @@
             
             svg.appendChild(path);
             container.appendChild(svg);
+            
+            // 7mを超えた場合、距離ラベルを表示
+            const actualDistanceM = parseFloat(document.getElementById('rackDistance').value);
+            if (actualDistanceM > 7) {
+                const distanceLabel = document.createElement('div');
+                distanceLabel.className = 'distance-label';
+                distanceLabel.textContent = `ラック間 ${actualDistanceM}m`;
+                distanceLabel.style.left = `${(x1 + x2) / 2 - 40}px`;
+                distanceLabel.style.top = `${floorY - 20}px`;
+                container.appendChild(distanceLabel);
+            }
         }
 
         function createHeightScale(maxHeight) {
@@ -1105,7 +1133,9 @@
             const distance = distanceM * 1000;
             const rackCount = parseInt(document.getElementById('rackCount').value);
             
-            const pixelDistance = distance * SCALE * 0.3;
+            // 7mまでは通常通り、7m超えは7mの表示で固定
+            const displayDistance = Math.min(distanceM, 7) * 1000;
+            const pixelDistance = displayDistance * SCALE * 0.3;
             
             let visualizationHtml = `<div class="rack-container" style="gap: ${pixelDistance}px;">`;
             
